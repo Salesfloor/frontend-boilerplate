@@ -27,7 +27,7 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-mocha": "^0.4.11",
     "grunt-nunjucks": "^0.1.4",
-    "grunt-sass": "^0.17.0",
+    "grunt-sass": "1.0.0",
     "grunt-webdriver": "^0.4.8",
     "jshint": "^2.6.0",
     "uglify": "^0.1.1",
