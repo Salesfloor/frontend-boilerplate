@@ -9,7 +9,6 @@ import AppLayout from 'app/layouts/AppLayout';
 */
 Marionette.Renderer.render = function(template, data){
     console.log(data);
-    debugger;
     return nunjucks.render(template, data);
 };
 

@@ -6,4 +6,9 @@ export default class AppLayout extends Marionette.LayoutView {
     super(...rest);
     this.template = "components/main/main.html";
   }
+
+  onRender () {
+    this.header = new Header({el: '#header'});
+    this.header.render();
+  }
 }
