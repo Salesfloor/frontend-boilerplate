@@ -1,14 +1,18 @@
-<html>
-<head>
-	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-  	<link rel="stylesheet" href="dist/css/dev/main.css">
-</head>
-  <body>
-	<div id="header" class="row"></div>
-	<div id="sidebar"></div>
-	<div id="main"></div>
-  	<script src="dist/js/dependencies.js"></script>
-  	<script src="dist/js/bundle_dev.js"></script>
-  </body>
-</html>
+<!DOCTYPE html>
+<html lang="en" class="">
+<head></head>
+<body>
+  <div id="main"></div>
 
+  <script src="vendor/system.js"></script>
+  <script src="config.js"></script>
+  <script>
+  System.import('backbone').then(function(Backbone) {
+    System.import('jquery').then(function() {
+      Backbone.$ = $;
+      System.import('app/app');
+    });
+  });
+  </script>
+</body>
+</html>
