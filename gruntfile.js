@@ -13,8 +13,16 @@ module.exports = function(grunt) {
       }
     },
 
+    nunjucks: {
+      precompile: {
+        baseDir: 'app',
+        src: ['app/views/**/*.html','app/components/**/*.html','app/layouts/**/*.html'],
+        dest: 'app/templates/templates.js'
+      }
+    },
 
 
   grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-nunjucks');
 
 };
