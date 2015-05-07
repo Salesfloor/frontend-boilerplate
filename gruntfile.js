@@ -21,8 +21,29 @@ module.exports = function(grunt) {
       }
     },
 
+    sass: {
+      options: {
+        sourceMap: true
+      },
+      dev: {
+        files: {
+          'dist/css/dev/main.css': 'app/css/main.scss'
+        }
+      },
+      dist: {
+        options:{
+          outputStyle : "compressed",
+          sourceMap : "false"
+        },
+        files: {
+          'dist/css/main.css': 'app/css/main.scss'
+        }
+      }
+    },
+  });
 
   grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-sass');
   grunt.loadNpmTasks('grunt-nunjucks');
 
 };
