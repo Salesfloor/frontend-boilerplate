@@ -55,12 +55,19 @@ build_deps = {
   },
 
   get_deps: function (config) {
-    return JSON.stringify(config);
+    var components = config.components,
+        import_strings = "";
+        self = this;
+    components.forEach(function (obj) {
+      import_strings += self.get_export_string(obj)
+    });
+
+    return import_strings;
   },
 
-  get_export_string: function (obj, component) {
+  get_export_string: function (component) {
     var component_path = this.get_component_path(component)
-    return 'import App.' + obj.toLowerCase() + ' from ' + component_path;
+    return 'import App.' + component + ' from ' + component_path + '\n';
   },
 
   get_component_path: function (component) {
