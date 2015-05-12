@@ -273,7 +273,7 @@ build_sass = {
 
     return gulp.src(path)
       .pipe(this.copy_imports())
-      .pipe(gulp.dest('app/components/'));
+      .pipe(gulp.dest('app/css/'));
   },
 
   // Build the final sass imports file
