@@ -254,6 +254,7 @@ build_sass = {
   build_imports: function (self, retailer) {
     return through2.obj(function(file, encoding, done) {
 
+      console.log(retailer, self.import_strings);
       var target_name = 'dependencies/components.'  + retailer + '.scss';
       var imports = new File({ cwd: "", base: "", path: target_name, contents: new Buffer(self.import_strings) });
 
@@ -284,43 +285,46 @@ build_sass = {
   }
 };
 
-
+// Task to build the base sass import file
+// With each component, no white-label
 gulp.task('sass-base', function () {
   return build_sass.sass_task('base');
 });
 
-gulp.task('sass-bru', function () {
-  return build_sass.sass_task('bru');
+
+/* Tri-period task :
+/* - Build the basic component import file
+/* - Add the white-label version given
+/*   a retailer by parameter,
+ *   TODO - Build all retailers if no params provided
+ * - Copy the scss dependency into the components' tree
+ */
+gulp.task('sass', function () {
+  var retailer = getRetailer();
+  if (!retailer) {
+    return console.log('Error: Please provide retailer');
+  }
+
+  gulp.task('sass-' + retailer, function () {
+    return build_sass.sass_task(retailer);
+  });
+
+  gulp.task('sass-copy-' + retailer, function () {
+    return build_sass.copy_sass(retailer);
+  });
+
+  runSequence('sass-base', 'sass-' + retailer, 'sass-copy-' + retailer);
 });
 
-gulp.task('sass-sw', function () {
-  return build_sass.sass_task('sw');
-});
 
-gulp.task('sass-immu', function () {
-  return build_sass.sass_task('immu');
-});
+function getArgs() {
+  return Object.keys(gutil.env).filter(function (key) {
+    return key !== '_';
+  });
+}
 
-gulp.task('sass-bru-base', function () {
-  runSequence('sass-base', 'sass-bru');
-});
-
-gulp.task('sass-immu-base', function () {
-  runSequence('sass-base', 'sass-immu');
-});
-
-gulp.task('sass-sw-base', function () {
-  runSequence('sass-base', 'sass-sw');
-});
-
-gulp.task('sass-copy-bru', function () {
-  return build_sass.copy_sass('bru');
-});
-
-gulp.task('sass-copy-immu', function () {
-  return build_sass.copy_sass('immu');
-});
-
-gulp.task('sass-copy-sw', function () {
-  return build_sass.copy_sass('sw');
-});
+function getRetailer() {
+  return Object.keys(gutil.env).filter(function (key) {
+    return key !== '_';
+  })[0];
+}
