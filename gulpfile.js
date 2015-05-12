@@ -216,7 +216,7 @@ build_sass = {
     return lazypipe()
       .pipe(gulp.src, this.paths.get(retailer))
       .pipe(this.gather_imports, this)
-      .pipe(this.build_imports, this)
+      .pipe(this.build_imports, this, retailer)
       .pipe(gulp.dest, './')
   },
 
@@ -251,10 +251,10 @@ build_sass = {
   },
 
   // Build the final sass imports file
-  build_imports: function (self) {
+  build_imports: function (self, retailer) {
     return through2.obj(function(file, encoding, done) {
 
-      var target_name = 'app/components/components.scss'
+      var target_name = 'dependencies/components.'  + retailer + '.scss';
       var imports = new File({ cwd: "", base: "", path: target_name, contents: new Buffer(self.import_strings) });
 
       done(null, imports);
@@ -264,6 +264,23 @@ build_sass = {
   // Execute the given sass lazypipe
   sass_task: function (retailer) {
     return this.get_sass_pipe(retailer)();
+  },
+
+  copy_sass: function (retailer) {
+    return gulp.src('dependencies/components.' + retailer + '.scss')
+      .pipe(this.copy_imports())
+      .pipe(gulp.dest('app/components/'));
+  },
+
+  // Build the final sass imports file
+  copy_imports: function () {
+    return through2.obj(function(file, encoding, done) {
+
+      var target_name = 'components.scss';
+      var imports = new File({ cwd: "", base: "", path: target_name, contents: file.contents });
+
+      done(null, imports);
+    });
   }
 };
 
@@ -296,3 +313,14 @@ gulp.task('sass-sw-base', function () {
   runSequence('sass-base', 'sass-sw');
 });
 
+gulp.task('sass-copy-bru', function () {
+  return build_sass.copy_sass('bru');
+});
+
+gulp.task('sass-copy-immu', function () {
+  return build_sass.copy_sass('immu');
+});
+
+gulp.task('sass-copy-sw', function () {
+  return build_sass.copy_sass('sw');
+});
