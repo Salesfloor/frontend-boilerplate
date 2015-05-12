@@ -21,15 +21,6 @@ gulp.task('bundle-deps', function () {
   return build_deps.write_deps();
 });
 
-function string_src(filename, string) {
-  var src = require('stream').Readable({ objectMode: true })
-  src._read = function () {
-    this.push(new gutil.File({ cwd: "", base: "", path: filename, contents: new Buffer(string) }))
-    this.push(null)
-  }
-  return src
-}
-
 function string_buffer(filename, buffer) {
   var src = require('stream').Readable({ objectMode: true })
   src._read = function () {
@@ -179,9 +170,10 @@ build_deps = {
   }
 };
 
+// Build an array of tasks to altenatively
+// write each component file
+// and bundle each retailer app
 gulp.task('build-all', function () {
-  // Build the array of tasks to write each component file
-  // And then bundle each retailer app
   var build_tasks = build_deps.retailers.reduce(function (tasks, retailer) {
     tasks.push('write-component-' + retailer);
     tasks.push('build-' + retailer);
