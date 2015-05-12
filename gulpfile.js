@@ -268,7 +268,10 @@ build_sass = {
   },
 
   copy_sass: function (retailer) {
-    return gulp.src('dependencies/components.' + retailer + '.scss')
+    var path = 'dependencies/components.' + retailer + '.scss';
+    if (!fs.existsSync(path)) { path = 'dependencies/components.base.scss'; }
+
+    return gulp.src(path)
       .pipe(this.copy_imports())
       .pipe(gulp.dest('app/components/'));
   },
