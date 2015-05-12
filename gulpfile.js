@@ -1,5 +1,6 @@
 //initialize all of our variables
-var app, base, gulp, gutil, runSequence, shell, build_deps, path, through2, File, fs, run;
+var app, base, gulp, gutil, runSequence, shell, path, through2, File, fs, run, lazypipe;
+var build_deps, build_sass;
 
 //load all of our dependencies
 //add more here if you want to include more libraries
@@ -12,6 +13,7 @@ runSequence   = require('run-sequence');
 shell         = require('gulp-shell');
 fs            = require('fs');
 run           = require('gulp-run');
+lazypipe      = require('lazypipe');
 
 gulp.task('write-deps', function () {
   return build_deps.parse_configs();
@@ -21,6 +23,7 @@ gulp.task('bundle-deps', function () {
   return build_deps.write_deps();
 });
 
+// Wrapper to write to file within a stream
 function string_buffer(filename, buffer) {
   var src = require('stream').Readable({ objectMode: true })
   src._read = function () {
@@ -29,6 +32,9 @@ function string_buffer(filename, buffer) {
   }
   return src
 }
+
+
+// White label components build process
 
 build_deps = {
   retailers: [],
@@ -187,3 +193,106 @@ gulp.task('build-all', function () {
 gulp.task('build-deps', function () {
   runSequence('write-deps', 'bundle-deps', 'build-all');
 });
+
+
+build_sass = {
+
+  // Get scss base component path
+  // And the path for each retailer's component
+  paths: {
+    'base': 'app/components/*/*.scss',
+    retailer: function (retailer) {
+      return 'app/components/*/retailers/' + retailer + '/*.scss'
+    },
+    get: function (path) {
+      if (this[path]) { return this[path]; }
+      else { return this.retailer(path); }
+    }
+  },
+
+  // Returns a lazypipe to build the sass
+  // imports for a given retailer
+  build_sass_pipe: function (retailer) {
+    return lazypipe()
+      .pipe(gulp.src, this.paths.get(retailer))
+      .pipe(this.gather_imports, this)
+      .pipe(this.build_imports, this)
+      .pipe(gulp.dest, './')
+  },
+
+
+  // Getter for a given sass lazypipe
+  sass_pipe: {},
+  get_sass_pipe: function (retailer) {
+    if (this.sass_pipe[retailer] == null) {
+      this.sass_pipe[retailer] = this.build_sass_pipe(retailer);
+    }
+    return this.sass_pipe[retailer];
+  },
+
+  // Gather import strings necessary for current build
+  // and concatenate them in one string
+  import_strings: '',
+  gather_imports: function (self) {
+    return through2.obj(function(file, encoding, done) {
+
+      var filepath = self.get_component_filepath(file);
+      self.import_strings += "@import " + filepath + ";\n";
+
+      done(null, file);
+    });
+  },
+
+  // Get the component path to import from
+  get_component_filepath: function (file) {
+    var filename = path.basename(file.path);
+    var pattern = 'components/'
+    return file.path.slice(file.path.search(pattern) + pattern.length);
+  },
+
+  // Build the final sass imports file
+  build_imports: function (self) {
+    return through2.obj(function(file, encoding, done) {
+
+      var target_name = 'app/components/components.scss'
+      var imports = new File({ cwd: "", base: "", path: target_name, contents: new Buffer(self.import_strings) });
+
+      done(null, imports);
+    });
+  },
+
+  // Execute the given sass lazypipe
+  sass_task: function (retailer) {
+    return this.get_sass_pipe(retailer)();
+  }
+};
+
+
+gulp.task('sass-base', function () {
+  return build_sass.sass_task('base');
+});
+
+gulp.task('sass-bru', function () {
+  return build_sass.sass_task('bru');
+});
+
+gulp.task('sass-sw', function () {
+  return build_sass.sass_task('sw');
+});
+
+gulp.task('sass-immu', function () {
+  return build_sass.sass_task('immu');
+});
+
+gulp.task('sass-bru-base', function () {
+  runSequence('sass-base', 'sass-bru');
+});
+
+gulp.task('sass-immu-base', function () {
+  runSequence('sass-base', 'sass-immu');
+});
+
+gulp.task('sass-sw-base', function () {
+  runSequence('sass-base', 'sass-sw');
+});
+
