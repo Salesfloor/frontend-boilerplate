@@ -168,7 +168,7 @@ build_deps = {
       // Bundle a specific retailer version
       // Along with all their specific components
       gulp.task('build-' + frozenRetailer, function () {
-        return run('jspm bundle app/app build.' + frozenRetailer + '.js').exec();
+        return run('jspm bundle-sfx app/app build.' + frozenRetailer + '.js').exec();
       });
 
       done(null, file);
