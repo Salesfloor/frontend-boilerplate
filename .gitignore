@@ -4,3 +4,4 @@ dist
 vendor/github
 vendor/npm
 vendor/etc
+app/templates
