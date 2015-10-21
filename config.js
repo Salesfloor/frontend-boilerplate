@@ -4,7 +4,8 @@ System.config({
   transpiler: "babel",
   babelOptions: {
     "optional": [
-      "runtime"
+      "runtime",
+      "es7.decorators"
     ]
   },
   paths: {
@@ -18,7 +19,8 @@ System.config({
     "backbone": "npm:backbone@1.2.3",
     "backbone.babysitter": "github:marionettejs/backbone.babysitter@0.1.6",
     "backbone.wreqr": "github:marionettejs/backbone.wreqr@1.3.2",
-    "core-js": "npm:core-js@1.2.2",
+    "benmccormick/backbone-decorators": "github:benmccormick/backbone-decorators@0.0.3",
+    "core-js": "npm:core-js@0.9.6",
     "jquery": "github:components/jquery@2.1.3",
     "marionette": "github:marionettejs/backbone.marionette@2.4.3",
     "nunjucks": "npm:nunjucks@1.3.4",
